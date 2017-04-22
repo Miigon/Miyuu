@@ -15,9 +15,6 @@ namespace Miyuu.Patcher.Engine.Modifications
 	{
 		public const string Terraria = "Terraria, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
 		public const string TerrariaServer = "TerrariaServer, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
-		public const string Otapi = "OTAPI, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
-		public const string Tml = "tModLoader, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
-		public const string TmlServer = "tModLoaderServer, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
 
 		[ModApplyTo("*"), ModOrder(50)]
 		public void AddCnJson()
@@ -28,11 +25,11 @@ namespace Miyuu.Patcher.Engine.Modifications
 			inst[line].Operand = "Chinese";
 
 			Info("加入外置语言包..");
-			SourceModuleDef.Resources.Add(new EmbeddedResource("Terraria.Localization.Content.Chinese.json", File.ReadAllBytes(@"..\TerrariaTextsInChinese\Texts\Terraria.Localization.Content.Chinese.json"), ManifestResourceAttributes.Public));
-			SourceModuleDef.Resources.Add(new EmbeddedResource("Terraria.Localization.Content.Chinese.Town.json", File.ReadAllBytes(@"..\TerrariaTextsInChinese\Texts\Terraria.Localization.Content.Chinese.Town.json"), ManifestResourceAttributes.Public));
+			SourceModuleDef.Resources.Add(new EmbeddedResource("Terraria.Localization.Content.Chinese.json", File.ReadAllBytes(@"../TerrariaTextsInChinese/Texts/Terraria.Localization.Content.Chinese.json"), ManifestResourceAttributes.Public));
+			SourceModuleDef.Resources.Add(new EmbeddedResource("Terraria.Localization.Content.Chinese.Town.json", File.ReadAllBytes(@"../TerrariaTextsInChinese/Texts/Terraria.Localization.Content.Chinese.Town.json"), ManifestResourceAttributes.Public));
 		}
 
-		[ModApplyTo(Terraria, Tml), ModOrder]
+		[ModApplyTo(Terraria), ModOrder]
 		public void ReplaceForUi()
 		{
 			Info("替换菜单项目..");
@@ -276,7 +273,7 @@ namespace Miyuu.Patcher.Engine.Modifications
 			}
 
 			var newinst = method.Body.Instructions.Where(i => i.OpCode == OpCodes.Ldstr && !string.IsNullOrWhiteSpace(i.Operand?.ToString())).ToList();
-			var cnText = new Reader(@"..\TerrariaTextsInChinese\Texts\evilGood.json").GetTextItems();
+			var cnText = new Reader(@"../TerrariaTextsInChinese/Texts/evilGood.json").GetTextItems();
 
 			for (var i = 0; i < newinst.Count; i++)
 			{
@@ -290,7 +287,7 @@ namespace Miyuu.Patcher.Engine.Modifications
 			Info("Angler..");
 			var method = SourceModuleDef.Find("Terraria.Lang", false).FindMethod("AnglerQuestChat");
 			var inst = method.Body.Instructions.Where(i => i.OpCode == OpCodes.Ldstr && !string.IsNullOrWhiteSpace(i.Operand?.ToString())).ToList();
-			var cnText = new Reader(@"..\TerrariaTextsInChinese\Texts\AnglerQuestChat.json").GetTextItems();
+			var cnText = new Reader(@"../TerrariaTextsInChinese/Texts/AnglerQuestChat.json").GetTextItems();
 
 			for (var i = 0; i < inst.Count; i++)
 			{
@@ -298,274 +295,7 @@ namespace Miyuu.Patcher.Engine.Modifications
 			}
 		}
 
-		[ModApplyTo(Tml, TmlServer)]
-		public void TmodLoaderUi()
-		{
-			Info("正在替换TML界面信息..");
-
-			var items = new Dictionary<string, string>
-			{
-				["Mods"] = "模组列表",
-				["Mod Sources"] = "模组源码",
-				["Mod Browser (Beta)"] = "模组浏览器 (测试版)",
-				["Download Mods From Servers: On"] = "从服务器下载模组: 开启",
-				["Download Mods From Servers: Off"] = "从服务器下载模组: 关闭",
-				["Only Download Signed Mods From Servers: On"] = "只从服务器上下载经签名的模组: 开启",
-				["Only Download Signed Mods From Servers: Off"] = "只从服务器上下载经签名的模组: 关闭",
-				["Experimental Features: On"] = "实验特性: 开启",
-				["Experimental Features: Off"] = "实验特性: 关闭",
-				["Clear Mod Browser Credentials"] = "清空模组浏览器证书",
-				["Terraria Server "] = "Terraria 服务器 ",
-				["enabled"] = "开启",
-				["disabled"] = "关闭",
-				["e\t\tEnable All"] = "e\t\t启用所有",
-				["d\t\tDisable All"] = "d\t\t禁用所有",
-				["r\t\tReload and return to world menu"] = "r\t\t重新加载后返回世界菜单",
-				["Type a number to switch between enabled/disabled"] = "输入数字以切换启用或禁用",
-				["Type a command: "] = "输入指令: ",
-				["Unloading mods..."] = "卸载模组中...",
-			};
-			InvokeReplace("Terraria.ModLoader.Interface", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Cancel"] = "取消",
-				["Downloading: "] = "下载中: "
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIDownloadMod", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Please Enter Your Passcode"] = "请输入你的密码",
-				["Submit"] = "提交",
-				["Visit Website to Generate Passphrase"] = "访问网站以生成密码",
-				["Paste Passphrase (ctrl-v)"] = "粘贴密码 (CTRL+V)"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIEnterPassphraseMenu", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Continue"] = "继续",
-				["Open Logs"] = "打开日志"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIErrorMessage", items);
-
-			items = new Dictionary<string, string>
-			{
-				["OK"] = "好"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIInfoMessage", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Finding Mods..."] = "寻找模组中..",
-				["Compatibilizing: "] = "兼容处理中: ",
-				["Reading: "] = "读取中: ",
-				["Setting up..."] = "设置中: ",
-				["Loading Mod: "] = "加载中: ",
-				["Adding Recipes..."] = "增加配方: ",
-				["Initializing: "] = "初始化: "
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UILoadMods", items);
-
-			items = new Dictionary<string, string>
-			{
-				["My Published Mods"] = "我的已发布模组",
-				["Back"] = "返回",
-				["Mod Browser OFFLINE (Busy)"] = "模组浏览器离线. (忙)",
-				["Mod Browser OFFLINE."] = "模组浏览器离线."
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIManagePublished", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Mod Browser"] = "模组浏览器",
-				["Getting data..."] = "加载数据中..",
-				["Don't show again"] = "以后不要再提示了",
-				["Reload browser"] = "重新加载列表",
-				["Populating browser..."] = "加载中...",
-				["Back"] = "返回",
-				["Type to search"] = "键入以搜索",
-				["You have updated a mod. Remember to reload mods for it to take effect."] = "你已经更新了模组。\n你需要进入模组菜单点击重新加载使其生效。",
-				["Your recently downloaded mods are currently disabled. Remember to enable and reload if you intend to use them."] = "你最近下载的模组现在被禁用了。\n你需要进入模组菜单开启模组并点击重新加载使其生效。",
-				["Mod Browser OFFLINE (Busy)"] = "模组浏览器离线. (忙)",
-				["Mod Browser OFFLINE (404)"] = "模组浏览器离线. (404)",
-				["Mod Browser OFFLINE.."] = "模组浏览器离线..",
-				["Mod Browser OFFLINE (Unknown)"] = "模组浏览器离线. (未知)",
-				["Mod Browser OFFLINE."] = "模组浏览器离线.",
-				["Clear Special Filter: "] = "清除特殊筛选器: ",
-				["Clear Special Filter: ??"] = "清除特殊筛选器: ??",
-				["None"] = "无"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIModBrowser", items);
-
-			items = new Dictionary<string, string>
-			{
-				["More info"] = "更多信息",
-				["By: "] = "作者: ",
-				["Update"] = "更新",
-				["Downgrade"] = "降级",
-				["Download"] = "下载",
-				["The Mod Browser server is under heavy load. Try again later."] = "模组浏览器正忙, 请稍后再试.",
-				["Unknown Mod Browser Error. Try again later."] = "未知模组浏览器错误, 请稍后再试.",
-				["This mod depends on: "] = "本模组依赖于: ",
-				["There was a problem, try again"] = "发生问题, 请重新加载",
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIModDownloadItem", items);
-
-			items = new Dictionary<string, string>
-			{
-				["This is a test of mod info here."] = "这里是一条测试消息.",
-				["Mod Info"] = "模组信息",
-				["Mod Info: "] = "模组信息: ",
-				["Visit the Mod's Homepage for even more info"] = "访问该模组的网页来获取更多信息",
-				["Back"] = "返回",
-				["No description available"] = "无可用描述",
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIModInfo", items);
-
-			items = new Dictionary<string, string>
-			{
-				["By: "] = "作者: ",
-				["More info"] = "更多信息",
-				["Enabled"] = "已启用",
-				["Enable"] = "启用",
-				["Disabled"] = "已禁用",
-				["Disable"] = "禁用",
-				["Reload Required"] = "需要重新加载",
-				[" items"] = " 物品",
-				[" NPCs"] = " NPC",
-				[" tiles"] = " 物块",
-				[" walls"] = " 墙壁",
-				[" buffs"] = " Buff",
-				[" mounts"] = " 坐骑"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIModItem", items);
-
-			items = new Dictionary<string, string>
-			{
-				[" - by "] = " - 作者: ",
-				[" downloads ("] = " 次下载 (",
-				[" latest version)"] = " 最新版本)",
-				["Unpublish"] = "取消发布"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIModManageItem", items);
-
-			items = new Dictionary<string, string>
-			{
-				["View List"] = "查看列表",
-				["Enable this List"] = "启用该列表",
-				["Enable only this List"] = "只启用该列表",
-				["{0} Total, {1} Enabled, {2} Disabled, {3} Missing"] = "总共 {0}, 启用了 {1} , 禁用了 {2} , 缺少 {3}",
-				["The following mods were not found:\n"] = "以下模组未找到:\n",
-				["This list contains the following mods:\n"] = "该列表包含以下模组:\n",
-				[" - Missing"] = " - 缺少"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIModPackItem", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Mod Packs"] = "模组整合包",
-				["Back"] = "返回",
-				["Save Enabled as New Mod Pack"] = "保存已开启模组为新整合包",
-				["Enter Mod Pack name"] = "输入新整合包名"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIModPacks", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Mods List"] = "模组列表",
-				["Enable All"] = "启用全部模组",
-				["Disable All"] = "禁用全部模组",
-				["Reload Mods"] = "重新加载模组",
-				["Back"] = "返回",
-				["Open Mods Folder"] = "打开模组文件夹",
-				["Type to search"] = "键入以搜索",
-				["Mod Packs"] = "模组整合包",
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIMods", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Build"] = "生成",
-				["Build + Reload"] = "生成并重新加载",
-				["Publish"] = "发布"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIModSourceItem", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Mod Sources"] = "模组源码",
-				["Build All"] = "生成所有模组",
-				["Build + Reload All"] = "生成并重新加载所有模组",
-				["Back"] = "返回",
-				["Open Sources"] = "打开源码",
-				["Manage Published"] = "管理已发布模组"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIModSources", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Ignore"] = "忽略",
-				["Download"] = "下载"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UIUpdateMessage", items);
-
-			items = new Dictionary<string, string>
-			{
-				["The game has crashed!"] = "本游戏崩溃了!",
-				["Adding mod content..."] = "增加模组内容...",
-			};
-			InvokeReplace("Terraria.ModLoader.ModLoader", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Sort mod names alphabetically"] = "按模组名字母顺序",
-				["Sort mod names reverse-alphabetically"] = "按模组名字母倒序",
-				["Sort by downloads descending"] = "下载量从大到小",
-				["Sort by downloads ascending"] = "下载量从小到大",
-				["Sort by recently updated"] = "近期更新",
-				["Sort by popularity"] = "按模组人气排序",
-				["Unknown Sort"] = "未知"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.SortModesExtensions", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Search by Mod name"] = "搜索模组名",
-				["Search by Author name"] = "搜索作者名",
-				["Unknown Sort"] = "未知"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.SearchFilterModesExtensions", items);
-
-			items = new Dictionary<string, string>
-			{
-				["Show all mods"] = "显示所有模组",
-				["Show mods not installed and updates"] = "显示未安装和有更新的模组",
-				["Show only updates"] = "显示有更新的模组",
-				["Unknown Sort"] = "未知"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.UpdateFilterModesExtensions", items);
-
-			items = new Dictionary<string, string>
-			{
-				[" seconds ago"] = "秒之前",
-				["1 second ago"] = "1秒之前",
-				["1 minute ago"] = "1分钟之前",
-				[" minutes ago"] = "分钟之前",
-				["1 hour ago"] = "1小时之前",
-				[" hours ago"] = "小时之前",
-				["1 day ago"] = "1天之前",
-				[" days ago"] = "天之前",
-				[" months ago"] = "月之前",
-				["1 month ago"] = "1月之前",
-				[" years ago"] = "年之前",
-				["1 year ago"] = "1年之前"
-			};
-			InvokeReplace("Terraria.ModLoader.UI.TimeHelper", items);
-		}
-
-		[ModApplyTo(TerrariaServer, TmlServer, Otapi)]
+		[ModApplyTo(TerrariaServer)]
 		public void ServerLang()
 		{
 			Info("修改服务器标题..");
@@ -602,62 +332,6 @@ namespace Miyuu.Patcher.Engine.Modifications
 				new { OpCodes.Ldc_I4_2 },
 				new { OpCodes.Stsfld, Operand = (IField)field }
 			);
-		}
-
-		[ModApplyTo(TmlServer), ModOrder(100)]
-		public void TmlServerHardCodedString()
-		{
-			var method = SourceModuleDef.Find("Terraria.Main", false).FindMethod("DedServ");
-
-			var target =
-				method.Body.Instructions.Single(
-					i =>
-							i.OpCode.Equals(OpCodes.Ldstr) && string.Equals(i.Operand.ToString(), "Running one update...", StringComparison.Ordinal));
-			target.Operand = "执行更新..";
-
-			target =
-				method.Body.Instructions.Single(
-					i =>
-							i.OpCode.Equals(OpCodes.Ldstr) && string.Equals(i.Operand.ToString(), "m\t\tMods Menu", StringComparison.Ordinal));
-			target.Operand = "m\t\t模组菜单";
-
-			target =
-				method.Body.Instructions.Single(
-					i =>
-							i.OpCode.Equals(OpCodes.Ldstr) && string.Equals(i.Operand.ToString(), "b\t\tMod Browser", StringComparison.Ordinal));
-			target.Operand = "b\t\t模组浏览器";
-
-			method = SourceModuleDef.Find("Terraria.ModLoader.Interface", false).FindMethod("ServerModBrowserMenu");
-
-			target =
-				method.Body.Instructions.Single(
-					i =>
-							i.OpCode.Equals(OpCodes.Ldstr) && string.Equals(i.Operand.ToString(), "b\t\tReturn to world menu", StringComparison.Ordinal));
-			target.Operand = "b\t\t返回到世界选择界面";
-
-			target =
-				method.Body.Instructions.Single(
-					i =>
-							i.OpCode.Equals(OpCodes.Ldstr) && string.Equals(i.Operand.ToString(), "Type an exact ModName to download: ", StringComparison.Ordinal));
-			target.Operand = "输入模组名以下载: ";
-		}
-
-		[ModApplyTo(Otapi)]
-		public void NetDefaultsCnToEn()
-		{
-			var method = SourceModuleDef.Find("Terraria.Main", false).FindMethod("InitializeDirect");
-			var itemName = SourceModuleDef.Find("Terraria.Lang", false).FindMethod("itemName");
-
-			var inst = method.Body.Instructions;
-
-			var target = inst.Single(x => x.OpCode.Equals(OpCodes.Ldfld) && (x.Operand as IField)?.Name == "name");
-			var line = inst.IndexOf(target);
-
-			inst[line - 1] = inst[line - 2].Clone();
-
-			inst[line] = Instruction.Create(OpCodes.Call, itemName);
-
-			inst.Insert(line, OpCodes.Ldc_I4_1.ToInstruction());
 		}
 
 #region replaces
@@ -716,7 +390,8 @@ namespace Miyuu.Patcher.Engine.Modifications
 			foreach (var ins in inst)
 			{
 				if (!ins.OpCode.Equals(OpCodes.Ldstr)) continue;
-				if (!items.TryGetValue(ins.Operand.ToString(), out string newString))
+				string newString;
+				if (!items.TryGetValue(ins.Operand.ToString(), out newString))
 				{
 					continue;
 				}
@@ -732,9 +407,6 @@ namespace Miyuu.Patcher.Engine.Modifications
 		{
 			Terraria,
 			TerrariaServer,
-			Otapi,
-			Tml,
-			TmlServer
 		};
 	}
 }

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Miyuu.Patcher.Engine</RootNamespace>
     <AssemblyName>Miyuu.Patcher.Engine</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -35,15 +35,6 @@
       <HintPath>..\packages\dnlib.1.6.1\lib\dnlib.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Windows\Microsoft.NET\assembly\GAC_32\Microsoft.Xna.Framework\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
-    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Windows\Microsoft.NET\assembly\GAC_32\Microsoft.Xna.Framework.Graphics\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Graphics.dll</HintPath>
-    </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.4.1\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
@@ -52,6 +43,9 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="FNA">
+      <HintPath>..\libs\FNA.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logging.cs" />
@@ -70,10 +64,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Miyuu.Cns\Miyuu.Cns.csproj">
-      <Project>{665075fa-4a0e-4b05-9c16-4e10d76da95b}</Project>
-      <Name>Miyuu.Cns</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Miyuu.Extensions\Miyuu.Extensions.csproj">
       <Project>{664a8d1e-1cdb-4f74-bde1-b64504e689e2}</Project>
       <Name>Miyuu.Extensions</Name>
@@ -81,6 +71,10 @@
     <ProjectReference Include="..\Miyuu.TextWrapper\Miyuu.TextWrapper.csproj">
       <Project>{5f14bf80-0be1-4d86-b6a7-6d9af4a56138}</Project>
       <Name>Miyuu.TextWrapper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Miyuu.Cns\Miyuu.Cns.csproj">
+      <Project>{665075FA-4A0E-4B05-9C16-4E10D76DA95B}</Project>
+      <Name>Miyuu.Cns</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

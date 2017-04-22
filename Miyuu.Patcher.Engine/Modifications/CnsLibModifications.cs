@@ -13,9 +13,6 @@ namespace Miyuu.Patcher.Engine.Modifications
 	{
 		public const string Terraria = "Terraria, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
 		public const string TerrariaServer = "TerrariaServer, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
-		public const string Otapi = "OTAPI, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
-		public const string Tml = "tModLoader, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
-		public const string TmlServer = "tModLoaderServer, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
 
 		[ModApplyTo("*")]
 		public void InsertCnLib()
@@ -25,7 +22,7 @@ namespace Miyuu.Patcher.Engine.Modifications
 			SourceModuleDef.Resources.Add(new EmbeddedResource(name, File.ReadAllBytes(name), ManifestResourceAttributes.VisibilityMask));
 		}
 
-		[ModApplyTo(Terraria, Tml)]
+		[ModApplyTo(Terraria)]
 		public void AddCnsField()
 		{
 			var main = SourceModuleDef.Find("Terraria.Main", true);
@@ -44,7 +41,7 @@ namespace Miyuu.Patcher.Engine.Modifications
 			);
 		}
 
-		[ModApplyTo(Terraria, Tml)]
+		[ModApplyTo(Terraria)]
 		public void InsertPostInitCall()
 		{
 			var main = SourceModuleDef.Find("Terraria.Main", false);
@@ -65,9 +62,6 @@ namespace Miyuu.Patcher.Engine.Modifications
 		{
 			Terraria,
 			TerrariaServer,
-			Otapi,
-			Tml,
-			TmlServer
 		};
 	}
 }

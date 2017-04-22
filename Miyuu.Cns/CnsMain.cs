@@ -4,10 +4,10 @@ using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Color = Microsoft.Xna.Framework.Color;
 #endif
@@ -21,53 +21,36 @@ namespace Miyuu.Cns
 
 		private FontFamily _cnFont; // 内存分配
 
-		private IntPtr _gXaudioDll;
-
-		private IntPtr _pXAudio2;
-
-		private static bool _userInput;
-
 		public CnsMain(Game game)
 		{
 			_instance = game;
-
-			try
-			{
-				InitializeXAudio();
-				_instance.Exiting += OnExiting;
-			}
-			catch
-			{
-				// ignored
-			}
 		}
 
-		private void OnExiting(object sender, EventArgs eventArgs)
+		/* 输入法退格修复 by Miigon */
+		private static bool _hasList = false;
+		private static bool _hasListOld = false;
+		private static string _ImeComposition = "";
+		private static void OnTextEditing(string composition)
 		{
-			if (_pXAudio2 != IntPtr.Zero)
-			{
-				// release
-			}
-
-			if (_gXaudioDll != IntPtr.Zero)
-			{
-				FreeLibrary(_gXaudioDll);
-				_gXaudioDll = IntPtr.Zero;
-			}
+			_ImeComposition = composition;
+			_hasListOld = _hasList;
+			_hasList = true;
+		}
+		private static void OnTextInput(char c)
+		{
+			_hasListOld = _hasList;
+			_hasList = false;// 上屏或退格
 		}
 
-		private unsafe void InitializeXAudio()
+		public static bool GcsTest(ref string originText)
 		{
-			_gXaudioDll = LoadLibraryEx("XAudio2_6.DLL", IntPtr.Zero, LoadLibrarySearchSystem32);
-
-			var xAudio2Out = IntPtr.Zero;
-			XAudio2Create_(&xAudio2Out, 0, DefaultProcessor);
-			_pXAudio2 = xAudio2Out;
+			return Terraria.Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Back) && (_hasListOld || _hasList);
 		}
 
 		public void Initialize()
 		{
-			ClaymanInputCaputure.Initialize(_instance.Window);
+			TextInputEXT.TextEditing += OnTextEditing;
+			TextInputEXT.TextInput += OnTextInput;
 		}
 
 		public void PostInitialize()
@@ -97,18 +80,6 @@ namespace Miyuu.Cns
 
 			_cnFont = font;
 
-#if TML
-			if (Main.XfontCombatText == null)
-			{
-				Main.XfontCombatText = new SpriteFontCn[2];
-			}
-
-			Main.XfontMouseText = new SpriteFontCn(new Font(_cnFont, 17.55F, GraphicsUnit.Pixel));
-			Main.XfontItemStack = new SpriteFontCn(new Font(_cnFont, 16.2F, GraphicsUnit.Pixel));
-			Main.XfontDeathText = new SpriteFontCn(new Font(_cnFont, 33.75F, GraphicsUnit.Pixel));
-			Main.XfontCombatText[1] = new SpriteFontCn(new Font(_cnFont, 20.25F, GraphicsUnit.Pixel));
-			Main.XfontCombatText[0] = new SpriteFontCn(new Font(_cnFont, 17.55F, GraphicsUnit.Pixel));
-#else
 			if (Main.fontCombatText == null)
 			{
 				Main.fontCombatText = new SpriteFontCn[2];
@@ -119,7 +90,6 @@ namespace Miyuu.Cns
 			Main.fontDeathText = new SpriteFontCn(new Font(_cnFont, 33.75F, GraphicsUnit.Pixel));
 			Main.fontCombatText[1] = new SpriteFontCn(new Font(_cnFont, 20.25F, GraphicsUnit.Pixel));
 			Main.fontCombatText[0] = new SpriteFontCn(new Font(_cnFont, 17.55F, GraphicsUnit.Pixel));
-#endif
 		}
 
 		public static void DrawGroupInfo(Color color)
@@ -147,50 +117,14 @@ namespace Miyuu.Cns
 					num108 = -2;
 				if (i == 3)
 					num108 = 2;
-#if TML
-				var o3 = Main.XfontMouseText.MeasureString(groupInfo);
-#else
 				var o3 = Main.fontMouseText.MeasureString(groupInfo);
-#endif
 				o3.X *= 0.5f;
 				o3.Y *= 0.5f;
-#if !TML
 				Main.spriteBatch.DrawString(Main.fontMouseText, groupInfo,
 					new Vector2(o3.X + num107 + 10f, Main.screenHeight - o3.Y + num108 - 22f), c6, 0f, o3, 1f, SpriteEffects.None, 0f);
-#else
-				Main.spriteBatch.DrawString(Main.XfontMouseText, groupInfo,
-					new Vector2(Main.screenWidth - o3.X + num108 - 10f, Main.screenHeight - o3.Y + num107 - 23f), c6, 0f, o3, 1f, SpriteEffects.None, 0f);
-#endif
 				Main.ignoreErrors = false;
 			}
 		}
-
-		public static void Update()
-		{
-			_userInput = ClaymanInputCaputure.ForceEnable || Main.drawingPlayerChat || Main.editSign || Main.editChest || Main.gameMenu && Main.menuMode == 888;
-			if (_userInput && !Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
-			{
-				if (!ClaymanInputCaputure.Enabled)
-					ClaymanInputCaputure.OpenImm();
-			}
-			else if (ClaymanInputCaputure.Enabled)
-			{
-				ClaymanInputCaputure.CloseImm();
-			}
-		}
-
-		[DllImport("kernel32.dll", SetLastError = true)]
-		private static extern IntPtr LoadLibraryEx(string dllToLoad, IntPtr hFile, uint flags);
-
-		[DllImport("kernel32", SetLastError = true)]
-		private static extern bool FreeLibrary(IntPtr hModule);
-
-		[DllImport("xaudio2_8.dll", EntryPoint = "XAudio2Create", CallingConvention = CallingConvention.StdCall)]
-		private static extern unsafe int XAudio2Create_(void* arg0, int arg1, int arg2);
-
-		private const uint LoadLibrarySearchSystem32 = 0x00000800;
-
-		private const int DefaultProcessor = 0x00000001;
 #endif
 			}
 }

@@ -11,7 +11,6 @@ namespace Miyuu.Patcher.Engine.Modifications
 	internal class CnImeModifications : ModificationBase
 	{
 		public const string Terraria = "Terraria, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
-		public const string Tml = "tModLoader, Version=1.3.4.4, Culture=neutral, PublicKeyToken=null";
 
 		[ModApplyTo("*")]
 		public void InsertPreInitCall()
@@ -29,19 +28,6 @@ namespace Miyuu.Patcher.Engine.Modifications
 		}
 
 		[ModApplyTo("*")]
-		public void InsertPostUpdateCall()
-		{
-			var main = SourceModuleDef.Find("Terraria.Main", false);
-			var method = main.FindMethod("Update");
-
-			var inst = method.Body.Instructions;
-
-			inst.Insert(0,
-				new { OpCodes.Call, Operand = Importer.Import(typeof(CnsMain), "Update") }
-			);
-		}
-
-		[ModApplyTo("*")]
 		public void ReplaceGetInputText()
 		{
 			var method = SourceModuleDef.Find("Terraria.Main", false).FindMethod("GetInputText");
@@ -51,7 +37,7 @@ namespace Miyuu.Patcher.Engine.Modifications
 
 			inst.Insert(0,
 				new { OpCodes.Ldarga_S, Operand = method.Parameters[0] },
-				new { OpCodes.Call, Operand = Importer.Import(typeof(ClaymanInputCaputure), "GcsTest") },
+				new { OpCodes.Call, Operand = Importer.Import(typeof(CnsMain), "GcsTest") },
 				new { OpCodes.Brfalse_S, Operand = ins },
 				new { OpCodes.Ldarg_0 },
 				new { OpCodes.Ret }
@@ -80,7 +66,6 @@ namespace Miyuu.Patcher.Engine.Modifications
 		public override IEnumerable<string> TargetAssemblys => new[]
 		{
 			Terraria,
-			Tml,
 		};
 	}
 }

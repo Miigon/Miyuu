@@ -15,10 +15,6 @@ namespace Miyuu.Patcher.Engine
 
 		public string OutputAssemblyPath { get; }
 
-		public bool IsTml { get; private set; }
-
-		public bool IsTmlServer { get; private set; }
-
 		private ModuleDefMD _module;
 
 		private Importer _importer;
@@ -35,14 +31,10 @@ namespace Miyuu.Patcher.Engine
 			_module = ModuleDefMD.Load(fullpath);
 
 			_importer = new Importer(_module);
-
-			CheckTml();
 		}
 
 		private void Write()
 		{
-			ChangeTmlName();
-
 			_module.Write(OutputAssemblyPath);
 		}
 
@@ -99,34 +91,6 @@ namespace Miyuu.Patcher.Engine
 				Console.WriteLine("保存失败!{0}\t{1}", Environment.NewLine, ex);
 
 			}
-		}
-
-		private void CheckTml()
-		{
-			if (_module.Find("Terraria.ModLoader.ModLoader", false) == null)
-			{
-				return;
-			}
-
-			IsTml = true;
-
-			if (_module.Find("Terraria.Program", false).FindMethod("LaunchGame")?.Body.Instructions.Any(
-						 i => i.OpCode.Equals(OpCodes.Callvirt) && i.Operand.ToString().EndsWith("Main::DedServ()")) == true)
-			{
-				IsTmlServer = true;
-				_module.Assembly.Name = "tModLoaderServer";
-				return;
-			}
-
-			_module.Assembly.Name = "tModLoader";
-		}
-
-		private void ChangeTmlName()
-		{
-			if (!IsTml)
-				return;
-
-			_module.Assembly.Name = "Terraria";
 		}
 	}
 }
